@@ -1,14 +1,26 @@
 import express, { type Request, Response, NextFunction } from "express";
+import cookieParser from "cookie-parser";
+import cors from "cors";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
 const app = express();
+
+// Enable CORS
+app.use(cors({
+  origin: true,
+  credentials: true,
+}));
+
+// Parse cookies
+app.use(cookieParser());
 
 declare module 'http' {
   interface IncomingMessage {
     rawBody: unknown
   }
 }
+
 app.use(express.json({
   verify: (req, _res, buf) => {
     req.rawBody = buf;
