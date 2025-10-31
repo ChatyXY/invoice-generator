@@ -1,0 +1,109 @@
+Project brief (generate full-stack starter project)
+--------------------------------------------------
+Stack:
+- Frontend: React (Vite), React Router, Axios, Tailwind CSS (optional)
+- Backend: Node.js + Express
+- Database: MySQL (use Sequelize or knex — prefer Sequelize)
+- Auth: JWT (access + refresh token)
+- File storage: local uploads (multer) + option to plug S3 later
+- PDF: pdfkit or Puppeteer (HTML->PDF)
+- Excel: exceljs or xlsx to read/write and fill templates
+- Dev scripts: concurrently to run front + back
+
+Primary features to implement:
+1. JWT-based authentication
+   - Admin login endpoint: POST /api/auth/login (email + password)
+   - Tokens: short-lived access token, refresh token cookie (httpOnly)
+   - Middleware: verify JWT for protected routes (isAdmin guard)
+
+2. CRUD Admin Panel (React)
+   - Models: Users(Admins), Employees, Invoices, Attendance, ExcelTemplates, Reports
+   - UI: list, create, update, delete, search, pagination
+   - Role: only admin can access admin panel
+
+3. Invoice Generator (PDF)
+   - Endpoint: POST /api/invoices/generate or GET /api/invoices/:id/pdf
+   - Backend generates PDF from HTML template (pug/ejs/handlebars) and returns as buffer or download
+   - Save invoice metadata in DB and store generated PDF file path
+
+4. Report generator (Excel template autofill)
+   - Upload Excel template (xlsx) with placeholders (e.g. {{name}}, {{period}}, {{salary}})
+   - Endpoint: POST /api/reports/fill { templateId, data }
+   - Backend fills template using exceljs and returns filled file for download
+   - Auto map columns if given CSV/Excel input of multiple rows
+
+5. Absensi (Attendance)
+   - Admin-managed: admin can create attendance records for employees, mark present/absent, import from Excel
+   - Endpoints: GET/POST/PUT attendance
+   - Option: employee self-check (later) with IP/fingerprint
+
+6. File uploads & templates
+   - Upload endpoints for Excel templates and invoice assets (company logo)
+   - Validate file types
+
+7. Security & devops
+   - Input validation (Joi or express-validator)
+   - Rate limiting for auth endpoints
+   - Env config (.env sample)
+   - Instructions: how to run, migrations, seed admin
+
+Database schema (minimum)
+- users: id, name, email, password_hash, role, created_at, updated_at
+- employees: id, nik, name, position, bank_account, salary, created_at, updated_at
+- invoices: id, employee_id, amount, items(json), pdf_path, status, created_at
+- attendance: id, employee_id, date, status(enum: present/absent/leave), note
+- templates: id, name, file_path, type(enum: excel, invoice_html), placeholders(json)
+- reports: id, template_id, generated_path, meta(json), created_by
+
+Env variables (example .env.example)
+- PORT=4000
+- DB_HOST=
+- DB_USER=
+- DB_PASS=
+- DB_NAME=
+- JWT_SECRET=
+- JWT_REFRESH_SECRET=
+- JWT_ACCESS_EXPIRES=15m
+- JWT_REFRESH_EXPIRES=7d
+- UPLOAD_DIR=./uploads
+
+Dev / run instructions to show in README
+- Install and run:
+  - cd backend && npm install
+  - cd frontend && npm install
+  - Use concurrently or two terminals:
+    - npm run dev (backend)
+    - npm run dev (frontend)
+- DB:
+  - run migrations (or sequelize.sync for starter)
+  - seed admin user (email: admin@company.test, password: admin123) — change later
+
+API endpoints (summary)
+- POST /api/auth/login
+- POST /api/auth/refresh
+- POST /api/auth/logout
+- CRUD /api/employees
+- CRUD /api/invoices  + /api/invoices/:id/pdf
+- POST /api/templates/upload
+- POST /api/reports/fill
+- CRUD /api/attendance
+
+Implementation notes for Replit AI (add these extra instructions)
+- Create minimal but working UI for admin panel (login, dashboard, employees, invoices, templates)
+- For PDF generation, use a simple HTML invoice template using inline CSS; convert to PDF with Puppeteer or html-pdf.
+- For Excel autofill, include 1 example template pre-loaded using the uploaded files (use provided payroll/invoice samples) and demonstrate filling one record and multi-row export.
+- Add unit tests for auth and invoice generation endpoints (basic)
+- Add README with env and example cURL requests
+
+Files present (use as sample templates)
+- Use the uploaded payroll/invoice example files in project seed/templates so the report generator demo works. Example: RIFKI ANANDA.pdf (payroll slip sample). (The actual Excel payroll files should be added to /backend/templates on scaffold). :contentReference[oaicite:1]{index=1}
+
+Deliverable expectation from Replit AI:
+- A runnable monorepo with /frontend and /backend
+- Working JWT auth + admin login
+- Demonstration pages: upload template, generate invoice PDF, fill excel template and download result, basic attendance CRUD
+- Clear README and .env.example
+
+Extra: If Replit offers "Create app" with a single click template, prefer Vite + Express template and then add features above.
+
+End of prompt.
