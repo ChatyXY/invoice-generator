@@ -1,228 +1,272 @@
-# Design Guidelines: Admin Panel & Management System
+# Admin Panel Design Guidelines
 
-## Design Approach
+## Design Framework
+Modern SaaS dashboard inspired by Linear, Vercel, and Stripe. Principles: information density without clutter, workflow efficiency, predictable patterns, data-first hierarchy.
 
-**Selected Framework:** Modern Admin Dashboard Pattern (Reference-Based)
-Drawing inspiration from Linear, Vercel Dashboard, and Stripe Admin for clean, data-focused interfaces that prioritize usability and efficiency.
+## Typography
 
-**Core Principles:**
-- Data clarity over decoration
-- Efficient workflows with minimal clicks
-- Professional, trustworthy aesthetic
-- Scannable information hierarchy
-- Consistent, predictable patterns
+**Fonts:**
+- UI: Inter (Google Fonts)
+- Data: JetBrains Mono (tables, IDs, timestamps, code)
 
----
+**Scale:**
+- Page Headers: `text-3xl font-semibold`
+- Section Titles: `text-xl font-semibold`
+- Card Headers: `text-lg font-medium`
+- Body: `text-base`
+- Table Headers: `text-sm font-semibold uppercase tracking-wide`
+- Table Data: `text-sm font-mono`
+- Meta: `text-xs text-gray-600`
+- Stats: `text-4xl font-bold`
 
-## Typography System
+**Weights:** Semibold (600) headers, Medium (500) subheadings, Normal (400) body, Bold (700) large numbers only.
 
-**Font Stack:**
-- Primary: Inter (via Google Fonts CDN)
-- Monospace: JetBrains Mono (for data tables, codes)
+## Layout
 
-**Hierarchy:**
-- Page Titles: text-3xl font-semibold (30px)
-- Section Headers: text-xl font-semibold (20px)
-- Card Titles: text-lg font-medium (18px)
-- Body Text: text-base font-normal (16px)
-- Table Headers: text-sm font-semibold uppercase tracking-wide (14px)
-- Captions/Meta: text-xs text-gray-600 (12px)
-- Data Values: text-sm font-mono (for numbers, IDs, dates)
+**Spacing:** Use Tailwind units 2, 4, 6, 8 consistently.
+- Component padding: `p-4, p-6`
+- Section spacing: `mb-6, mb-8`
+- Grid gaps: `gap-4, gap-6`
+- Form spacing: `space-y-4`
 
----
-
-## Layout System
-
-**Spacing Primitives:** Tailwind units of 2, 4, 6, and 8 (p-4, gap-6, mb-8, etc.)
-
-**Dashboard Structure:**
+**Structure:**
 ```
-- Sidebar Navigation: fixed w-64 left sidebar
-- Main Content Area: ml-64 with max-w-7xl container
-- Top Bar: fixed header with user profile, notifications
-- Content Padding: p-6 to p-8 for main sections
-- Card Spacing: gap-6 for grid layouts, space-y-4 for stacked content
+Sidebar: w-64 fixed left
+Top Bar: Fixed header h-16
+Main: ml-64 max-w-7xl mx-auto p-8
 ```
 
-**Grid Patterns:**
-- Dashboard Cards: grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6
-- Data Tables: Full-width with horizontal scroll on mobile
-- Forms: Single column max-w-2xl for optimal input flow
-- Two-column layouts: grid-cols-1 lg:grid-cols-3 (sidebar) and lg:col-span-2 (main)
+**Grids:**
+- Dashboard Stats: `grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6`
+- Employee Cards: `grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6`
+- Forms: `grid-cols-1 lg:grid-cols-2 gap-x-8 gap-y-4`
 
----
+**Containers:** Main `max-w-7xl`, Forms `max-w-2xl`, Modals `max-w-lg` to `max-w-2xl`
 
-## Component Library
+## Components
 
 ### Navigation
-**Sidebar:**
-- Fixed left navigation (w-64)
-- Logo at top with company name
-- Grouped menu items with section headers
-- Active state: subtle background + accent border-l-4
-- Icons from Heroicons (outline style)
-- Collapsed state for mobile with hamburger toggle
 
-**Top Bar:**
-- Fixed header with breadcrumb trail
-- Right-aligned: search bar, notification bell, user avatar dropdown
-- Shadow on scroll for depth
+**Sidebar (w-64):**
+- Logo top: `h-8` with `text-lg` brand
+- Section headers: `text-xs uppercase mb-2`
+- Items: `py-2 px-3` with 20px Heroicons
+- Active: background + `border-l-4` accent
+- Mobile: overlay with backdrop
 
-### Authentication Pages
-**Login Page:**
-- Centered card (max-w-md) on neutral background
-- Company logo centered above form
-- Email and password inputs with visible labels
-- Primary CTA button (full width)
-- "Remember me" checkbox
-- No registration link (admin-only system)
+**Top Bar (h-16):**
+- Left: breadcrumbs
+- Right: search, notifications (badge), user dropdown
+- `flex items-center justify-between shadow-sm z-40`
 
-### Dashboard Widgets
-**Stat Cards:**
-- Grid of 4 cards showing key metrics (total employees, pending invoices, attendance rate, active templates)
-- Large number (text-3xl font-bold) with label below
-- Small trend indicator (icon + percentage)
-- Minimal styling with subtle border
+### Dashboard
 
-**Recent Activity:**
-- Table-style list with avatar + name + action + timestamp
-- Compact rows (py-3) with dividers
-- "View all" link at bottom
+**Metric Cards:**
+- `border rounded-lg p-6 bg-white`
+- Number: `text-4xl font-bold`
+- Label: `text-sm text-gray-600`
+- Trend: `text-xs` green/red with icon
+- Icons: 32px Heroicons
 
-### Data Tables
+**Activity Feed:**
+- Timeline with `border-l` + dots
+- Avatar + name + action + timestamp
+- `py-3` spacing, max 5 items
+- "View all" link bottom
+
+**Quick Actions:**
+- 2-column grid, icon + label cards
+- Hover elevation increase
+
+### Tables
+
 **Structure:**
-- Sticky header row with sortable columns
-- Striped rows (alternate background)
-- Row hover state for interactivity
-- Action buttons (edit, delete) in last column
-- Pagination at bottom (showing "1-10 of 234")
-- Search input and filter dropdowns above table
-- Empty state with icon and helpful message
+- Sticky header: `bg-gray-50`
+- Striped rows with hover highlight
+- Checkbox column: `w-12`
+- Actions column: `w-32`
+- Mobile: horizontal scroll, sticky first column
 
-**Table Elements:**
-- Checkboxes for bulk actions (first column)
-- Status badges (rounded-full px-3 py-1 text-xs)
-- Monospace font for IDs and dates
-- Truncated text with tooltip for long content
+**Features:**
+- Search/filter bar above
+- Bulk action toolbar when selected
+- Pagination: "Showing 1-20 of 234"
+- Status badges: `rounded-full px-3 py-1 text-xs font-medium`
+- Monospace: IDs, dates, currency
+- Empty state: icon + message + CTA
+
+**Columns:**
+- Text: left-aligned, truncate with tooltip
+- Numbers: right-aligned, monospace
+- Dates: monospace (MMM DD, YYYY)
+- Status: colored badges
+- Actions: right-aligned icon buttons
 
 ### Forms
+
 **Layout:**
-- Single column with clear field grouping
-- Label above input (text-sm font-medium mb-2)
-- Input fields with border, focus ring
-- Helper text below inputs (text-xs text-gray-600)
-- Error states: red border + error message
-- Required field indicator (red asterisk)
-- Form actions at bottom: Cancel (secondary) + Save (primary) aligned right
+- Single-column with `border-t pt-6` sections
+- Labels: `text-sm font-medium mb-2 block`
+- Required: `text-red-500 ml-1`
+- Helper: `text-xs text-gray-600 mt-1`
+- Error: `text-xs text-red-600 mt-1`
 
-**Input Types:**
-- Text inputs: h-10 rounded border px-3
-- Select dropdowns: native select styled consistently
-- Date pickers: input type="date" with calendar icon
-- File uploads: drag-drop zone with file preview
-- Textarea: min-h-32 for notes/descriptions
+**Inputs:**
+- Text/Email/Number: `h-10 border rounded-md px-3 w-full`
+- Select: `h-10` with chevron
+- Textarea: `min-h-32`
+- Date: calendar icon, native picker
+- File: dashed border drag-drop with icon
+- Checkbox/Radio: custom styled with accent
 
-### Modals & Overlays
-**Modal Structure:**
-- Semi-transparent backdrop (backdrop-blur-sm)
-- Centered card (max-w-lg) with rounded-lg shadow-xl
-- Header with title + close button
-- Content area with p-6
-- Footer with action buttons (right-aligned)
-- Slide-up animation on enter
+**Actions:**
+- `border-t pt-6 flex justify-end gap-3`
+- Cancel: secondary, Save: primary
+- Loading: disabled with spinner
 
-**Toast Notifications:**
-- Top-right corner positioning
-- Success/Error/Info variants with icons
-- Auto-dismiss after 5 seconds
-- Slide-in animation
+### Invoice System
+
+**Generator:**
+- Two-column: form `lg:w-2/3` + preview `lg:w-1/3`
+- Sections: client, line items, totals
+- Live preview (sticky)
+- PDF export button
+
+**Viewer:**
+- Full-width PDF with toolbar
+- Actions: Download, Print, Email, Mark Paid
+- Status sidebar: number, date, amount, badge
+- Workflow: Draft → Sent → Paid → Overdue
+
+### Excel Templates
+
+**Library:**
+- Card grid with file icon, name, placeholder count
+- Upload: dashed card with icon
+- Preview: modal with first 10 rows
+
+**Autofill:**
+- Split: template preview (left) + mapping (right)
+- Placeholder → value pairs
+- Generate + download buttons
+
+### Attendance
+
+**Calendar:**
+- Month grid (7 columns)
+- Day cells: date + status dot
+- Colors: Present (green), Absent (red), Leave (blue), Holiday (gray)
+- Click opens edit modal
+- Month nav + legend below
+
+**List View:**
+- Table with employee + date + status
+- Filter by range/employee
+- Bulk mark + export report
+
+### Employees
+
+**List:**
+- Card grid: avatar, name, role, department
+- Toggle table view
+- Hover actions: View, Edit, Deactivate
+- Add button top-right
+
+**Detail:**
+- Two-column: profile sidebar (1/3) + tabs (2/3)
+- Sidebar: large avatar, name, role, contact
+- Tabs: Overview, Attendance, Invoices, Documents
+
+### Modals
+
+**Structure:**
+- Backdrop: `backdrop-blur-sm bg-black/50`
+- Container: `max-w-lg` to `max-w-2xl rounded-lg shadow-2xl`
+- Header: `p-6 flex justify-between` + close
+- Content: `p-6 max-h-[80vh] overflow-y-auto`
+- Footer: `border-t p-6 flex justify-end gap-3`
+- Animation: scale + fade 200ms
+
+**Confirmations:**
+- Icon top (warning/success)
+- Clear question
+- Destructive actions in red
 
 ### Buttons
+
 **Variants:**
-- Primary: Solid background, white text, rounded-md px-4 py-2
-- Secondary: Border + transparent background
-- Danger: Red variant for destructive actions
-- Icon-only: Circular buttons for compact actions
-- Button groups: Connected buttons for related actions
+- Primary: solid background, white text, `px-4 py-2 rounded-md`
+- Secondary: border, transparent background
+- Tertiary: text-only, hover background
+- Danger: red for destructive
+- Icon-only: `w-8 h-8 rounded`
 
 **States:**
-- Hover: Slightly darker shade
-- Active: Pressed effect with subtle transform
-- Disabled: Reduced opacity + cursor-not-allowed
-- Loading: Spinner icon replacing text
+- Hover: darker, 100ms transition
+- Active: `scale(0.98)`
+- Disabled: `opacity-50 cursor-not-allowed`
+- Loading: spinner, disabled
 
 ### Cards
-**Standard Card:**
-- White background, border, rounded-lg
-- Padding p-6
-- Optional header with title and action button
-- Shadow-sm on default, shadow-md on hover
-- Dividers between sections (border-t my-4)
+- `bg-white border rounded-lg shadow-sm p-6`
+- Header: `flex justify-between items-center mb-4`
+- Dividers: `border-t my-4 pt-4`
+- Clickable hover: `shadow-md transition`
 
-### Invoice & Report Viewers
-**PDF Preview:**
-- Embedded viewer with toolbar (download, print, zoom)
-- Shadow frame showing document preview
-- Metadata sidebar: invoice number, date, amount, status
-
-**Excel Template Manager:**
-- File upload area with drag-drop
-- Template list showing name, type, placeholders count
-- Preview mode showing first few rows
-- Fill form with placeholder → value mapping
-
-### Attendance Calendar
-**Calendar View:**
-- Month view grid (7 columns for days)
-- Day cells showing attendance status (color-coded dots)
-- Click to see detail or edit
-- Legend for status colors
-- Navigation arrows for prev/next month
-
----
+### Toasts
+- Position: top-right, stacked `gap-2`
+- Variants: Success (green), Error (red), Warning (yellow), Info (blue)
+- Content: icon + message + close
+- Auto-dismiss: 5s with progress bar
+- Animation: slide-in right 200ms
 
 ## Animations
+**Philosophy:** Purposeful, subtle, fast
 
-**Minimal, Purposeful Motion:**
-- Page transitions: None (instant navigation)
-- Modal/Dropdown: 150ms ease-out
-- Hover states: 100ms ease
-- Loading states: Gentle pulse animation
-- Toast notifications: Slide-in from right (200ms)
+**Timing:**
+- Hover: 100ms ease
+- Modal/dropdown: 150ms ease-out
+- Loading: gentle pulse
+- Toasts: 200ms slide + fade
 
----
+**Avoid:** Page transitions, scroll-triggered, decorative motion, parallax
 
 ## Images
 
-**Logo/Branding:**
-- Company logo in sidebar top (max-h-10)
-- Favicon and login page logo
-- PDF invoice templates include logo placeholder
+**No hero images.** Utility-focused only.
 
-**Icons:**
-- Heroicons throughout (via CDN)
-- Consistent 20px size for nav items
-- 16px for inline icons
-- 24px for prominent actions
+**Usage:**
+- Logo: sidebar `h-8`, login `h-12`
+- Avatars: circular (`h-8` nav, `h-10` tables, `h-24` profile)
+- Fallback: initials with colored background
+- Icons: Heroicons (20px nav, 16px buttons, 24px actions, 48px empty states)
+- File icons: Document, Excel, PDF placeholders
+- Empty states: simple icon graphics
 
-**No Hero Images:** This is a utility application focused on data management. All screens are functional interfaces without marketing-style hero sections.
+## Responsive
 
-**User Avatars:**
-- Circular avatars (h-8 w-8 in nav, h-10 w-10 in tables)
-- Initials fallback if no photo
-- Default placeholder icon if no name
+**Breakpoints:**
+- Mobile (<768px): Stacked, overlay sidebar
+- Tablet (768-1024px): Persistent sidebar, 2-column
+- Desktop (>1024px): Full layout, 3-4 column
+
+**Mobile:**
+- Hamburger menu → sidebar overlay
+- Single column cards/forms
+- Horizontal scroll tables (sticky first column)
+- Full-screen modals
+- Bottom sheet quick actions
+- **Minimum 44px touch targets**
 
 ---
 
-## Responsive Behavior
-
-**Breakpoints:**
-- Mobile (< 768px): Collapsed sidebar, stacked cards, horizontal scroll tables
-- Tablet (768-1024px): Persistent sidebar, 2-column grids
-- Desktop (> 1024px): Full layout with 3-4 column grids
-
-**Mobile Adaptations:**
-- Hamburger menu for navigation
-- Bottom sheet modals instead of centered
-- Single column forms
-- Horizontal scroll for wide tables with sticky first column
+**Key Implementation Rules:**
+- Use Tailwind utilities consistently
+- Heroicons via CDN
+- Inter + JetBrains Mono fonts
+- Monospace for all data (IDs, dates, currency)
+- Status badges always `rounded-full`
+- Forms always single-column with section dividers
+- Tables always responsive with horizontal scroll
+- Modals always with backdrop blur
+- All animations ≤200ms
