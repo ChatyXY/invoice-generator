@@ -1,77 +1,71 @@
 import { sql } from "drizzle-orm";
-import { pgTable, text, varchar, integer, timestamp, pgEnum, jsonb } from "drizzle-orm/pg-core";
+import { mysqlTable, text, varchar, int, timestamp, mysqlEnum, json } from "drizzle-orm/mysql-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Enums
-export const roleEnum = pgEnum("role", ["admin", "user"]);
-export const attendanceStatusEnum = pgEnum("attendance_status", ["present", "absent", "leave"]);
-export const invoiceStatusEnum = pgEnum("invoice_status", ["pending", "paid", "overdue"]);
-export const templateTypeEnum = pgEnum("template_type", ["excel", "invoice_html"]);
-
 // Users table (for admin authentication)
-export const users = pgTable("users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+export const users = mysqlTable("users", {
+  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
   name: text("name").notNull(),
-  email: text("email").notNull().unique(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
   passwordHash: text("password_hash").notNull(),
-  role: roleEnum("role").notNull().default("admin"),
+  role: mysqlEnum("role", ["admin", "user"]).notNull().default("admin"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow().$onUpdate(() => new Date()),
 });
 
 // Employees table
-export const employees = pgTable("employees", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  nik: text("nik").notNull().unique(),
-  name: text("name").notNull(),
-  position: text("position").notNull(),
-  bankAccount: text("bank_account"),
-  salary: integer("salary").notNull(),
+export const employees = mysqlTable("employees", {
+  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+  nik: varchar("nik", { length: 50 }).notNull().unique(),
+  name: varchar("name", { length: 255 }).notNull(),
+  position: varchar("position", { length: 255 }).notNull(),
+  bankAccount: varchar("bank_account", { length: 100 }),
+  salary: int("salary").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow().$onUpdate(() => new Date()),
 });
 
 // Invoices table
-export const invoices = pgTable("invoices", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  invoiceNumber: text("invoice_number").notNull().unique(),
-  employeeId: varchar("employee_id").notNull().references(() => employees.id, { onDelete: "cascade" }),
-  amount: integer("amount").notNull(),
-  items: jsonb("items").notNull(), // Array of { description, quantity, price }
+export const invoices = mysqlTable("invoices", {
+  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+  invoiceNumber: varchar("invoice_number", { length: 100 }).notNull().unique(),
+  employeeId: varchar("employee_id", { length: 36 }).notNull().references(() => employees.id, { onDelete: "cascade" }),
+  amount: int("amount").notNull(),
+  items: json("items").notNull().$type<Array<{ description: string; quantity: number; price: number }>>(),
   pdfPath: text("pdf_path"),
-  status: invoiceStatusEnum("status").notNull().default("pending"),
+  status: mysqlEnum("status", ["pending", "paid", "overdue"]).notNull().default("pending"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
 // Attendance table
-export const attendance = pgTable("attendance", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  employeeId: varchar("employee_id").notNull().references(() => employees.id, { onDelete: "cascade" }),
+export const attendance = mysqlTable("attendance", {
+  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+  employeeId: varchar("employee_id", { length: 36 }).notNull().references(() => employees.id, { onDelete: "cascade" }),
   date: timestamp("date").notNull(),
-  status: attendanceStatusEnum("status").notNull(),
+  status: mysqlEnum("status", ["present", "absent", "leave"]).notNull(),
   note: text("note"),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
 // Templates table
-export const templates = pgTable("templates", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  name: text("name").notNull(),
+export const templates = mysqlTable("templates", {
+  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+  name: varchar("name", { length: 255 }).notNull(),
   filePath: text("file_path").notNull(),
-  type: templateTypeEnum("type").notNull(),
-  placeholders: jsonb("placeholders"), // Array of placeholder strings
+  type: mysqlEnum("type", ["excel", "invoice_html"]).notNull(),
+  placeholders: json("placeholders").$type<string[]>(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
 // Reports table
-export const reports = pgTable("reports", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  templateId: varchar("template_id").notNull().references(() => templates.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
+export const reports = mysqlTable("reports", {
+  id: varchar("id", { length: 36 }).primaryKey().$defaultFn(() => crypto.randomUUID()),
+  templateId: varchar("template_id", { length: 36 }).notNull().references(() => templates.id, { onDelete: "cascade" }),
+  name: varchar("name", { length: 255 }).notNull(),
   generatedPath: text("generated_path").notNull(),
-  meta: jsonb("meta"), // Additional metadata
-  createdBy: varchar("created_by").notNull().references(() => users.id),
+  meta: json("meta"),
+  createdBy: varchar("created_by", { length: 36 }).notNull().references(() => users.id),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
