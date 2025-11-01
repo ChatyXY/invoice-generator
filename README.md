@@ -1,6 +1,6 @@
 # 📊 HR & Payroll Management System
 
-Sistem manajemen HR dan Payroll berbasis web dengan fitur lengkap untuk mengelola karyawan, absensi, invoice, dan laporan. Aplikasi ini dibuat dengan full-stack JavaScript menggunakan React + Express + PostgreSQL.
+Sistem manajemen HR dan Payroll berbasis web dengan fitur lengkap untuk mengelola karyawan, absensi, invoice, dan laporan. Aplikasi ini dibuat dengan full-stack JavaScript menggunakan React + Express + MySQL.
 
 ## 🎯 Fitur Utama
 
@@ -39,7 +39,7 @@ Password: admin123
 ### Backend
 - **Node.js** - Runtime
 - **Express** - Web framework
-- **PostgreSQL** - Database
+- **MySQL** - Database
 - **Drizzle ORM** - Database ORM
 - **JWT** - Authentication
 - **Bcrypt** - Password hashing
@@ -105,34 +105,102 @@ Password: admin123
 
 ### Prasyarat
 - Node.js v20 atau lebih tinggi
-- PostgreSQL database (sudah tersetup otomatis di Replit)
+- MySQL 8.0 atau lebih tinggi
 
-### Instalasi & Menjalankan
+### Setup di Lokal (Komputer Anda)
 
-Aplikasi ini sudah dikonfigurasi untuk berjalan di Replit. Cukup klik tombol **Run** atau jalankan:
+#### 1. Install Prerequisites
+Pastikan sudah install:
+- **Node.js v20+** - Download di [nodejs.org](https://nodejs.org)
+- **MySQL 8.0+** - Download di [mysql.com](https://dev.mysql.com/downloads/mysql/)
 
+Cek versi:
 ```bash
-npm run dev
+node -v   # Harus v20+
+npm -v
+mysql --version
 ```
 
-Server akan berjalan di `http://localhost:5000` (atau URL Replit Anda).
-
-### Setup Database (Opsional)
-
-Jika database kosong, jalankan migrasi dan seed:
-
+#### 2. Setup Database MySQL
+Buat database baru:
 ```bash
-# Push schema ke database
-npm run db:push
+# Login ke MySQL
+mysql -u root -p
 
-# Seed data awal (admin user + sample data)
+# Buat database
+CREATE DATABASE hr_payroll;
+
+# Keluar dari mysql
+EXIT;
+```
+
+#### 3. Clone Project & Install Dependencies
+```bash
+# Clone dari GitHub (jika belum)
+git clone <repository-url>
+cd <project-folder>
+
+# Install dependencies
+npm install
+```
+
+Jika error, coba:
+```bash
+rm -rf node_modules package-lock.json
+npm install --legacy-peer-deps
+```
+
+#### 4. Setup Environment Variables
+Buat file `.env` di root folder:
+```env
+# Database - GANTI dengan kredensial MySQL Anda!
+DATABASE_URL=mysql://root:password_anda@localhost:3306/hr_payroll
+
+# Server
+PORT=5000
+NODE_ENV=development
+
+# JWT Secrets
+JWT_SECRET=your-secret-key-change-in-production
+JWT_REFRESH_SECRET=your-refresh-secret-change-in-production
+JWT_ACCESS_EXPIRES=15m
+JWT_REFRESH_EXPIRES=7d
+
+# Upload Directory
+UPLOAD_DIR=./uploads
+```
+
+**⚠️ PENTING:** Ganti `password_anda` dengan password MySQL root Anda!
+
+#### 5. Push Database Schema
+```bash
+npm run db:push
+```
+
+#### 6. Seed Database (Data Awal)
+```bash
 npx tsx server/seed.ts
 ```
 
 Ini akan membuat:
-- 1 admin user (admin@company.test)
+- 1 admin user (admin@company.test / admin123)
 - 3 sample karyawan
 - 1 template Excel sample
+
+#### 7. Jalankan Aplikasi
+```bash
+npm run dev
+```
+
+Buka browser: `http://localhost:5000`
+
+### Setup di Replit
+
+Di Replit, cukup:
+1. Klik tombol **Run**
+2. Database otomatis tersetup
+3. Seed database: `npx tsx server/seed.ts`
+4. Login dengan kredensial default
 
 ## 📖 Panduan Penggunaan
 
@@ -348,8 +416,27 @@ curl -X POST http://localhost:5000/api/invoices \
 - Check console logs untuk error detail
 
 ### Database connection error
-- Pastikan PostgreSQL running
-- Check environment variables `DATABASE_URL`
+- **Pastikan MySQL running:**
+  - Windows: Cek Services → MySQL80
+  - Mac: `brew services start mysql` 
+  - Linux: `sudo service mysql start`
+- **Check DATABASE_URL di `.env` sudah benar**
+- **Test koneksi:** `mysql -u root -p hr_payroll`
+- **Error "Access denied":** Password MySQL salah, update di `.env`
+- **Error "Unknown database":** Buat database: `CREATE DATABASE hr_payroll;`
+
+### npm install error
+```bash
+# Hapus dan install ulang
+rm -rf node_modules package-lock.json
+npm install --legacy-peer-deps
+```
+
+### Port 5000 already in use
+Ubah PORT di `.env`:
+```env
+PORT=3000
+```
 
 ### File upload tidak berfungsi
 - Pastikan folder `uploads/` ada dan writable
@@ -368,8 +455,8 @@ Aplikasi menggunakan environment variables berikut:
 PORT=5000
 NODE_ENV=development
 
-# Database
-DATABASE_URL=postgresql://...
+# Database - MySQL
+DATABASE_URL=mysql://root:password@localhost:3306/hr_payroll
 
 # JWT
 JWT_SECRET=your-secret-key-here
@@ -395,4 +482,4 @@ Jika ada pertanyaan atau issue, silakan buat issue di repository atau hubungi de
 
 ---
 
-**Dibuat dengan ❤️ menggunakan React, Express, dan PostgreSQL**
+**Dibuat dengan ❤️ menggunakan React, Express, dan MySQL**
