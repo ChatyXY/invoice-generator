@@ -142,6 +142,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     return res.json({ message: "Logged out successfully" });
   });
 
+  // Get current user
+  app.get("/api/auth/me", authenticateToken, async (req: Request, res: Response) => {
+    const authenticatedUser = (req as any).user;
+    if (!authenticatedUser) {
+      return res.status(401).json({ error: "Not authenticated" });
+    }
+    return res.json({
+      id: authenticatedUser.id,
+      name: authenticatedUser.name,
+      email: authenticatedUser.email,
+      role: authenticatedUser.role,
+    });
+  });
+
   // ============ EMPLOYEE ROUTES ============
   
   app.get("/api/employees", authenticateToken, isAdmin, async (req: Request, res: Response) => {
